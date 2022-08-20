@@ -70,13 +70,7 @@ interface IDefaultGridProps<TViewDTO> {
 }
 
 export const DefaultGrid = <TViewDTO,>(props: PropsWithChildren<IDefaultGridProps<TViewDTO>>) => {
-    const appCtx = useContext(AppContext)
-    const userCtx = useContext(UserContext)
     let gridRef = useRef<HTMLTableSectionElement>(null)
-
-    const [typeChecked, setTypeChecked] = useState<string>('emptyField');
-
-    const [pluginSettings, setPluginSettings] = useState<IPluginSettings>(props.plugin);
 
     const [data, setData] = useState<TViewDTO[]>(props?.data?.map(x => ({ ...x, idRow: uuidv4() })));
     const [selectedItem, setSelectedItem] = useState<IGridRow>();
@@ -98,22 +92,6 @@ export const DefaultGrid = <TViewDTO,>(props: PropsWithChildren<IDefaultGridProp
             props.onSelect?.(getRows()[0])
         }
     }, [data, props.filter.pageNumber])
-
-
-    useEffect(() => {
-        const selectedRows = getRows().filter(x => x.isSelected)
-        const rowsLength = getRows().length
-
-        if (selectedRows.length === rowsLength)
-            setTypeChecked('allChecked')
-
-        else if (selectedRows.length === 0)
-            setTypeChecked('emptyField')
-
-        else if (selectedRows.length < rowsLength)
-            setTypeChecked('indeterminate')
-
-    }, [getRows()])
 
     //Create array of rows and pushing data
     function getRows(): IGridRow[] {
@@ -185,16 +163,6 @@ export const DefaultGrid = <TViewDTO,>(props: PropsWithChildren<IDefaultGridProp
                         <tbody className={styles.gridRowsGroup} ref={gridRef}>
                             {
                                 getRows().map((item, index) => {
-                                    const cells = item.cells
-                                    let orderedCells: IGridCellWithWidth[] = [];
-                                    for (let i = 0; i < cells.length; i++) {
-                                        orderedCells.push({
-                                            ...cells[i],
-                                            order: pluginSettings.columns.find((item) => item.propertyName === cells[i].propertyName)?.order as number,
-                                            width: pluginSettings.columns.find((item) => item.propertyName === cells[i].propertyName)?.width as number
-                                        });
-                                    }
-                                    orderedCells = orderedCells.sort(compareByOrder)
 
                                     return (
                                         <tr
